@@ -21,7 +21,32 @@ uint8_t straight_move(uint8_t direction, uint8_t speed, uint8_t steps, uint16_t 
 
         initial_steps_difference = steps_required_left - steps_required_right;
 
-        set
+        while(steps_required_left > steps_left && steps_required_right > steps_right)
+        {
+            Read_distance(LEFT, &distance_left);
+            steps_left = distance_left.turns * MAX_STEPS + distance_left.steps;
+
+            Read_distance(RIGHT, &distance_left);
+            steps_right = distance_right.turns * MAX_STEPS + distance_right.steps;
+
+            steps_difference = steps_left - steps_right;
+
+            if(steps_difference - initial_steps_difference > 1)
+            {
+                Speed_motor(speed-20, RIGHT);
+                Speed_motor(speed, LEFT);
+            }
+            else if(steps_difference - initial_steps_difference < -1)
+            {
+                Speed_motor(speed, RIGHT);
+                Speed_motor(speed-20, LEFT);
+            }
+            else
+            {
+                Speed_motor(speed, RIGHT);
+                Speed_motor(speed, LEFT);
+            }
+        }
 
         return 0;
     }
