@@ -14,15 +14,10 @@ uint8_t straight_move(uint8_t direction, uint8_t speed, uint8_t steps, uint16_t 
         steps_left = distance_left.turns * MAX_STEPS + distance_left.steps;
         steps_required_left = turns * MAX_STEPS + steps + steps_left;
 
-        init_display();
-
         while(steps_required_left - steps_left > 0)
         {
             Read_distance(LEFT, &distance_left);
             steps_left = distance_left.turns * MAX_STEPS + distance_left.steps;
-
-
-            show_number(steps_required_left - steps_left);
 
             if(direction == FORWARD)
             {
@@ -42,14 +37,12 @@ uint8_t straight_move(uint8_t direction, uint8_t speed, uint8_t steps, uint16_t 
         }
 
         Speed_motor(0, RIGHT);
-                        Speed_motor(0, LEFT);
+        Speed_motor(0, LEFT);
 
         return 0;
     }
     else
     {
-        init_display();
-        show_string("ErrP");
         return 1;
     }
 }
