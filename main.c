@@ -18,7 +18,7 @@
  */
 
 void main(void) {
-	uint8_t compteur =0; /*To display */
+    distance_type dist;
 	uint8_t in_movement = 0,direction = 0;
 	WDTCTL = WDTPW | WDTHOLD;    // Stop watchdog timer
 
@@ -51,19 +51,18 @@ void main(void) {
 		else
 		{
 			/*Every 2ms we enter in the condition */
-			if(Tick_out == 1)
+			if(check_and_clear_Tick_out() == 1)
 			{
 				if(check_stop_steps() == 0) //if the robot need to stop
 					in_movement = 0; /* we are ready to launch new movement */
 				else
 					in_movement = 1;
 
-				Tick_out=0; /*Reset flag*/
 			}
 		}
 
 		/* Do something to show that we are using not blocking functions */
-		show_number(compteur);
-		compteur++;
+		Read_distance(LEFT, &dist);
+		show_number(dist.turns);
 	}
 }
