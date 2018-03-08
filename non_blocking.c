@@ -5,7 +5,7 @@
  *      Author: a001220-dev
  */
 #include "non_blocking.h"
-#include "../control_motors.h"
+#include "control_motors.h"
 
 static uint16_t distance_to_stop;
 

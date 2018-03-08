@@ -8,7 +8,7 @@
 #ifndef SQ_ESIGELEC_QC_NON_BLOCKING_H_
 #define SQ_ESIGELEC_QC_NON_BLOCKING_H_
 
-#include "../control_encoders.h"
+#include "control_encoders.h"
 
 #define FORWARD     1
 #define BACKWARD    0
