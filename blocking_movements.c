@@ -29,11 +29,6 @@ uint8_t straight_move(uint8_t direction, uint8_t speed, uint8_t steps, uint16_t 
                 Speed_motor(-speed, RIGHT);
                 Speed_motor(-speed, LEFT);
             }
-            else
-            {
-
-            }
-
         }
 
         Speed_motor(0, RIGHT);
