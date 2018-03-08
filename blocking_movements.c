@@ -5,9 +5,8 @@
 
 uint8_t straight_move(uint8_t direction, uint8_t speed, uint8_t steps, uint16_t turns)
 {
-    distance_type distance_left, distance_right;
-    uint16_t steps_right, steps_left, steps_required_left, steps_required_right;
-    uint16_t initial_steps_difference, steps_difference;
+    distance_type distance_left;
+    uint16_t steps_left, steps_required_left;
 
     if((direction == FORWARD || direction == BACKWARD) && (speed >= 0 || speed <= 100))
     {
@@ -15,38 +14,35 @@ uint8_t straight_move(uint8_t direction, uint8_t speed, uint8_t steps, uint16_t 
         steps_left = distance_left.turns * MAX_STEPS + distance_left.steps;
         steps_required_left = turns * MAX_STEPS + steps + steps_left;
 
-        Read_distance(RIGHT, &distance_left);
-        steps_right = distance_right.turns * MAX_STEPS + distance_right.steps;
-        steps_required_right = turns * MAX_STEPS + steps + steps_right;
+        init_display();
 
-        initial_steps_difference = steps_required_left - steps_required_right;
-
-        while(steps_required_left > steps_left && steps_required_right > steps_right)
+        while(steps_required_left - steps_left > 0)
         {
             Read_distance(LEFT, &distance_left);
             steps_left = distance_left.turns * MAX_STEPS + distance_left.steps;
 
-            Read_distance(RIGHT, &distance_left);
-            steps_right = distance_right.turns * MAX_STEPS + distance_right.steps;
 
-            steps_difference = steps_left - steps_right;
+            show_number(steps_required_left - steps_left);
 
-            if(steps_difference - initial_steps_difference > 1)
-            {
-                Speed_motor(speed-20, RIGHT);
-                Speed_motor(speed, LEFT);
-            }
-            else if(steps_difference - initial_steps_difference < -1)
+            if(direction == FORWARD)
             {
                 Speed_motor(speed, RIGHT);
-                Speed_motor(speed-20, LEFT);
+                Speed_motor(speed, LEFT);
+            }
+            else if(direction == BACKWARD)
+            {
+                Speed_motor(-speed, RIGHT);
+                Speed_motor(-speed, LEFT);
             }
             else
             {
-                Speed_motor(speed, RIGHT);
-                Speed_motor(speed, LEFT);
+
             }
+
         }
+
+        Speed_motor(0, RIGHT);
+                        Speed_motor(0, LEFT);
 
         return 0;
     }
