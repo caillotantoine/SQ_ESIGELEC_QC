@@ -1,14 +1,14 @@
 #include "blocking_movements.h"
-#include "../display.h"
-#include "../control_motors.h"
-#include "../control_encoders.h"
+#include "display.h"
+#include "control_motors.h"
+#include "control_encoders.h"
 
 uint8_t straight_move(uint8_t direction, uint8_t speed, uint8_t steps, uint16_t turns)
 {
     distance_type distance_left;
     uint16_t steps_left, steps_required_left;
 
-    if((direction == FORWARD || direction == BACKWARD) && (speed >= 0 || speed <= 100))
+    if((direction == FORWARD || direction == BACKWARD) && speed >= 0 && speed <= 100)
     {
         Read_distance(LEFT, &distance_left);
         steps_left = distance_left.turns * MAX_STEPS + distance_left.steps;
