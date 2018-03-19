@@ -11,8 +11,7 @@
 #ifndef SCHEDULER_H_
 #define SCHEDULER_H_
 
-extern uint16_t Tick_out;
-
 void callback_2ms(void);
+uint8_t check_and_clear_Tick_out(void);
 
 #endif /* SCHEDULER_H_ */
