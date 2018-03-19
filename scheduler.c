@@ -19,16 +19,26 @@ uint8_t check_and_clear_Tick_out(void)
 {
     uint16_t timer_backup = 0;      /* Save of the timer state */
     uint8_t  tckout = 0;            /* Variable used to return the value of Tick_out */
+    uint8_t  GIEdisabled = 0;
+
+    if(__get_SR_register() & GIE)   /* Check if the general interruptions are already disabled */
+    {
+        GIEdisabled = 0;            /* It was enabled */
+    }
+    else
+    {
+        GIEdisabled = 1;            /* It was disabled, be careful. */
+    }
 
     __disable_interrupt();          /* We disable the interruptions to avoid race conditions */
 
-    timer_backup = TA0CTL & TAIE;   /* We save the state of the timer interruption */
-    TA0CTL &= ~TAIE;                /* Reset the timer interruption */
     tckout = Tick_out;              /* We save the Tick_out value to return it later */
     Tick_out = 0;                   /* We reset Tick_out */
-    TA0CTL |= timer_backup;         /* We reset the timer interruption to the previous value*/
 
-    __enable_interrupt();           /* All the work on the variable is done, we can re-enable the interruption system */
+    if(!GIEdisabled)                /* We re-enable the general interruption only if it was not disabled before */
+    {
+        __enable_interrupt();       /* All the work on the variable is done, we can re-enable the interruption system */
+    }
 
     return tckout;                  /* We send the value of Tick_out */
 }
