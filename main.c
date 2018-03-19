@@ -7,11 +7,13 @@
 #include "compass.h"
 #include "control_motors.h"
 #include "scheduler.h"
+#include "bearing.h"
 
 #include "non_blocking.h"
 #include "blocking_movements.h"
 
 #define SPEED 30
+#define CENT_MS 1200000
 /*
 
  * main.c
@@ -19,52 +21,34 @@
  */
 
 void main(void) {
-    distance_type dist;
-	uint8_t in_movement = 0,direction = 0;
-	WDTCTL = WDTPW | WDTHOLD;    // Stop watchdog timer
+    uint16_t actual_bearing = 0;
+    int16_t target_bearing = 0;
 
-	Clock_graceInit_DCO_12M();
-	init_display();
-	Init_encoders_distance();
-	Init_motors();
+    //WDTCTL = WDTPW | WDTHOLD;    // Stop watchdog timer
+    init_timeout();
+    Clock_graceInit_DCO_12M();
+    init_display();
+    compass_init();
 
-	__enable_interrupt();
-
-	while(1)
-	{
-		if(in_movement == 0)
-		{
-			switch(direction)
-			{
-			case 0:
-				nb_spin_steps(RIGHT,SPEED,1,0);                /* Move forward */
-				break;
-			case 1:
-				nb_spin_steps(LEFT,SPEED,1,0);               /* Move backward */
-				break;
-			default:;
-			}
-
-			direction = 1 - direction;                              /* Change direction */
-			in_movement = 1;                                        /* Now we are in movement */
-		}
-		/*if the robot is moving check if it must stop*/
-		else
-		{
-			/*Every 2ms we enter in the condition */
-			if(check_and_clear_Tick_out() == 1)
-			{
-				if(check_stop_steps() == 0)                         /* If the robot need to stop */
-					in_movement = 0;                                /* we are ready to launch new movement */
-				else
-					in_movement = 1;
-
-			}
-		}
-
-		/* Do something to show that we are using not blocking functions */
-		Read_distance(LEFT, &dist);                                 /* We read the distance on the left wheel */
-		show_number(dist.turns);                                    /* We print the number of turn we made on the display */
-	}
+    while(1)
+    {
+        /*if it is ok, display the number*/
+        if(Read_compass_16(&actual_bearing) == 0)
+        {
+            if(new_brearing(actual_bearing, 900, &target_bearing) == 0)
+            {
+                show_number(target_bearing);
+            }
+            else
+            {
+                show_string("Err1");
+            }
+        }
+        else
+        {
+            show_string("Err0");
+        }
+        _delay_cycles(CENT_MS);
+    }
 }
 
