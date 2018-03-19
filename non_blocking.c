@@ -66,3 +66,38 @@ uint8_t nb_straight_move(uint8_t direction, uint8_t speed,uint16_t turns,uint8_t
 
 	return 0;
 }
+
+/**
+ * Non-Blocking function to spin
+ * Indicate the number of turns and steps to reach
+ * Return 1 if the parameters are not correct
+ */
+uint8_t nb_spin_steps(uint8_t direction, uint8_t speed,uint16_t turns,uint8_t steps)
+{
+	distance_type distance_left;
+
+	if( ((direction == RIGHT) || (direction == LEFT) ) && ( (speed >= 0) && (speed <= 100) ))
+	{
+		Read_distance(LEFT, &distance_left);
+		/* Use the same variable in order to use the same check_stop_steps() function */
+		distance_to_stop = distance_left.turns * MAX_STEPS + distance_left.steps + steps + turns * MAX_STEPS;
+
+		if(direction == RIGHT)	/* Spin to right */
+		{
+			Speed_motor(-speed,RIGHT);
+			Speed_motor(speed,LEFT);
+		}
+		else if (direction == LEFT)	/* Spin to left */
+		{
+			Speed_motor(speed,RIGHT);
+			Speed_motor(-speed,LEFT);
+		}
+	}
+	else
+	{
+		return 1;
+	}
+
+	return 0;
+}
+
