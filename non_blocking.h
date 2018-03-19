@@ -13,7 +13,11 @@
 #define FORWARD     1
 #define BACKWARD    0
 
+/* Straight Movement */
 uint8_t nb_straight_move(uint8_t direction, uint8_t speed, uint16_t turns, uint8_t steps);
 uint8_t check_stop_steps();
+
+/* Spin Movement */
+uint8_t nb_spin_steps(uint8_t direction, uint8_t speed, uint16_t turns, uint8_t steps);
 
 #endif /* SQ_ESIGELEC_QC_NON_BLOCKING_H_ */

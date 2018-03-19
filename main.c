@@ -21,7 +21,6 @@
  */
 
 void main(void) {
-
     uint16_t actual_bearing = 0;
     int16_t target_bearing = 0;
 
@@ -29,8 +28,6 @@ void main(void) {
     init_timeout();
     Clock_graceInit_DCO_12M();
     init_display();
-    Init_encoders_distance();
-    Init_motors();
     compass_init();
 
     while(1)
@@ -53,11 +50,5 @@ void main(void) {
         }
         _delay_cycles(CENT_MS);
     }
-
-
-    __enable_interrupt();
-
-
-    //spin_steps(RIGHT,30,1,0);
-
 }
+
