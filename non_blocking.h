@@ -19,5 +19,7 @@ uint8_t check_stop_steps();
 
 /* Spin Movement */
 uint8_t nb_spin_steps(uint8_t direction, uint8_t speed, uint16_t turns, uint8_t steps);
+uint8_t nb_spin_bearing(uint8_t direction, uint8_t speed, uint16_t target_bearing);
+uint8_t check_stop_bearing();
 
 #endif /* SQ_ESIGELEC_QC_NON_BLOCKING_H_ */

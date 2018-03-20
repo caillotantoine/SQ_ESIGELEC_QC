@@ -8,7 +8,7 @@
 
 uint8_t spin_bearing(uint8_t direction, uint8_t speed, uint16_t target_bearing)
 {
-	uint16_t actual_bearing = 0, actual_bearing2=0, actual_bearing3=0, upper, lower;
+	uint16_t actual_bearing = 0, upper, lower;
 	char stop =0;
 
 	if( ( (direction == RIGHT) || (direction == LEFT) ) && (speed >= 0) && (speed <= 100) && ( (target_bearing >= 0) && (target_bearing < 3600) ) )
@@ -18,13 +18,6 @@ uint8_t spin_bearing(uint8_t direction, uint8_t speed, uint16_t target_bearing)
 		{
 			show_string("Err1");
 		}
-		/*__delay_cycles(ONE_US);
-		Read_compass_16(&actual_bearing2);
-		__delay_cycles(ONE_US);
-		Read_compass_16(&actual_bearing3);
-		__delay_cycles(ONE_US);*/
-
-		//actual_bearing = (actual_bearing + actual_bearing2 + actual_bearing3)/3.0;
 
 		upper = target_bearing + 3600 + DELTA_BEARING;
 		lower = target_bearing + 3600 - DELTA_BEARING;
@@ -51,7 +44,6 @@ uint8_t spin_bearing(uint8_t direction, uint8_t speed, uint16_t target_bearing)
 
 		while(!stop)
 		{
-			//show_number((uint16_t)fabs(target_bearing - actual_bearing));
 			show_number(actual_bearing);
 
 			while(Read_compass_16(&actual_bearing) != 0)

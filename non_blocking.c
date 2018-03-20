@@ -6,8 +6,62 @@
  */
 #include "non_blocking.h"
 #include "control_motors.h"
+#include "blocking_movements.h"
 
 static uint16_t distance_to_stop;
+static uint16_t shared_target_bearing;
+
+uint8_t check_stop_bearing()
+{
+	uint16_t actual_bearing = 0, upper =0 , lower =0;
+
+	upper = shared_target_bearing + 3600 + DELTA_BEARING;
+	lower = shared_target_bearing + 3600 - DELTA_BEARING;
+
+	while(Read_compass_16(&actual_bearing) != 0);
+
+	if( ( ((actual_bearing+3600) <= upper) && ((actual_bearing+3600) >= lower) ) || (actual_bearing > lower)  )
+	{
+		Speed_motor(0,RIGHT);
+		Speed_motor(0, LEFT);
+		return 0;
+	}
+	else
+	{
+		return 1;
+	}
+
+}
+
+/* Non- blocking spin
+ * @param Direction The rotation direction (Right or Left)
+ * @param speed Between 0 to 100
+ * @param target_bearing The absolute bearing to reach
+ * Return 1 if the parameter are wrong, else 0 if everything ok*/
+uint8_t nb_spin_bearing(uint8_t direction, uint8_t speed, uint16_t target_bearing)
+{
+	if( ( (direction == RIGHT) || (direction == LEFT) ) && (speed >= 0) && (speed <= 100) && ( (target_bearing >= 0) && (target_bearing < 3600) ) )
+	{
+		if(direction == RIGHT)
+		{
+			Speed_motor(-speed, RIGHT);
+			Speed_motor(speed, LEFT);
+		}
+		else
+		{
+			Speed_motor(speed, RIGHT);
+			Speed_motor(-speed, LEFT);
+		}
+
+		shared_target_bearing = target_bearing;
+	}
+	else
+	{
+		return 1;
+	}
+
+	return 0;
+}
 
 /**
  * Check if the robot got the wanted distance
