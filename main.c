@@ -12,7 +12,7 @@
 #include "non_blocking.h"
 #include "blocking_movements.h"
 
-#define SPEED 30
+#define SPEED 25
 #define CENT_MS 1200000
 /*
 
@@ -21,34 +21,42 @@
  */
 
 void main(void) {
-    uint16_t actual_bearing = 0;
-    int16_t target_bearing = 0;
 
-    //WDTCTL = WDTPW | WDTHOLD;    // Stop watchdog timer
-    init_timeout();
-    Clock_graceInit_DCO_12M();
-    init_display();
-    compass_init();
+	uint16_t actual_bearing =0, target_bearing = 0;
+	int to_right=1;
 
-    while(1)
-    {
-        /*if it is ok, display the number*/
-        if(Read_compass_16(&actual_bearing) == 0)
-        {
-            if(new_brearing(actual_bearing, 900, &target_bearing) == 0)
-            {
-                show_number(target_bearing);
-            }
-            else
-            {
-                show_string("Err1");
-            }
-        }
-        else
-        {
-            show_string("Err0");
-        }
-        _delay_cycles(CENT_MS);
-    }
+	//WDTCTL = WDTPW | WDTHOLD;    // Stop watchdog timer
+	init_timeout();
+	Clock_graceInit_DCO_12M();
+	init_display();
+	compass_init();
+	Init_motors();
+
+	__enable_interrupt();
+
+	while(1){
+
+		while(Read_compass_16(&actual_bearing) != 0)
+		{
+			show_string("Err0");
+		}
+
+		if(to_right == 1)
+		{
+			new_bearing(actual_bearing,900,&target_bearing);
+			spin_bearing(RIGHT,SPEED,target_bearing);
+			to_right = 1 - to_right;
+		}
+		else
+		{
+			new_bearing(actual_bearing,-450,&target_bearing);
+			spin_bearing(LEFT,SPEED,target_bearing);
+			to_right = 1 - to_right;
+		}
+
+
+		__delay_cycles(5*CENT_MS);
+	}
+
 }
 
