@@ -12,6 +12,6 @@
 #include "stdint.h"
 
 /* Be careful, angle are multiplied by 10. so 90.1° would be 901. */
-uint8_t new_brearing(uint16_t actual_bearing, int16_t relative_angle, int16_t* new_bearing);
+uint8_t new_bearing(uint16_t actual_bearing, int16_t relative_angle, uint16_t* target_bearing);
 
 #endif /* SQ_ESIGELEC_QC_BEARING_H_ */

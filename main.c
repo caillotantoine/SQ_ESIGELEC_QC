@@ -8,9 +8,11 @@
 #include "control_motors.h"
 #include "scheduler.h"
 #include "bearing.h"
+#include "control_encoders.h"
 
 #include "non_blocking.h"
 #include "blocking_movements.h"
+#include "Turn_path.h"
 
 #define SPEED 30
 #define CENT_MS 1200000
@@ -21,34 +23,23 @@
  */
 
 void main(void) {
-    uint16_t actual_bearing = 0;
-    int16_t target_bearing = 0;
+    //uint16_t actual_bearing = 0;
+    //int16_t target_bearing = 0;
 
-    //WDTCTL = WDTPW | WDTHOLD;    // Stop watchdog timer
-    init_timeout();
+    WDTCTL = WDTPW | WDTHOLD;    // Stop watchdog timer
     Clock_graceInit_DCO_12M();
     init_display();
-    compass_init();
+    Init_motors();
+    Init_encoders_distance();
+    __enable_interrupt();
 
-    while(1)
-    {
-        /*if it is ok, display the number*/
-        if(Read_compass_16(&actual_bearing) == 0)
-        {
-            if(new_brearing(actual_bearing, 900, &target_bearing) == 0)
-            {
-                show_number(target_bearing);
-            }
-            else
-            {
-                show_string("Err1");
-            }
-        }
-        else
-        {
-            show_string("Err0");
-        }
-        _delay_cycles(CENT_MS);
-    }
+    show_number(0);
+    __delay_cycles(12000000);
+    show_number((uint16_t) -turn_step_plus(FORWARD, RIGHT, 30, 50, 3, 4));
+    __delay_cycles(12000000);
+    show_number((uint16_t) -turn_step_plus(BACKWARD, RIGHT, 30, 50, 3, 4));
+    __delay_cycles(12000000);
+    //turn_step_plus(BACKWARD, RIGHT, 30, 50, 3, 4);
+
 }
 
