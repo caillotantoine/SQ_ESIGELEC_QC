@@ -14,7 +14,7 @@
 #include "blocking_movements.h"
 #include "Turn_path.h"
 
-#define SPEED 30
+#define SPEED 22
 #define CENT_MS 1200000
 /*
 

@@ -3,6 +3,80 @@
 #include "control_motors.h"
 #include "control_encoders.h"
 
+#define ONE_MS 12000
+#define ONE_US 12
+
+uint8_t spin_bearing(uint8_t direction, uint8_t speed, uint16_t target_bearing)
+{
+	uint16_t actual_bearing = 0, upper, lower;
+	char stop =0;
+
+	if( ( (direction == RIGHT) || (direction == LEFT) ) && (speed >= 0) && (speed <= 100) && ( (target_bearing >= 0) && (target_bearing < 3600) ) )
+	{
+		/* Read bearing */
+		while(Read_compass_16(&actual_bearing) != 0)
+		{
+			show_string("Err1");
+		}
+
+		upper = target_bearing + 3600 + DELTA_BEARING;
+		lower = target_bearing + 3600 - DELTA_BEARING;
+
+		if( ( ((actual_bearing+3600) < upper) && ((actual_bearing+3600) > lower) ) || (actual_bearing > lower) || ((actual_bearing+7200) < upper) )
+		{
+			stop = 1;
+		}
+		else
+		{
+			stop = 0;
+
+			if(direction == RIGHT)
+			{
+				Speed_motor(-speed, RIGHT);
+				Speed_motor(speed, LEFT);
+			}
+			else
+			{
+				Speed_motor(speed, RIGHT);
+				Speed_motor(-speed, LEFT);
+			}
+		}
+
+		while(!stop)
+		{
+			show_number(actual_bearing);
+
+			while(Read_compass_16(&actual_bearing) != 0)
+			{
+				__delay_cycles(105*ONE_MS);
+
+				show_string("Err2");
+
+			}
+
+			if( ( ((actual_bearing+3600) <= upper) && ((actual_bearing+3600) >= lower) ) || (actual_bearing > lower)  )
+			{
+				stop = 1;
+			}
+			else
+			{
+				stop = 0;
+			}
+			__delay_cycles(105*ONE_MS);
+
+		}
+
+		Speed_motor(0, RIGHT);
+		Speed_motor(0, LEFT);
+
+		return 0;
+	}
+	else
+	{
+		return 1; 		/* If the parameters are wrong values, we return an error code */
+	}
+}
+
 uint8_t spin_steps(uint8_t direction, uint8_t speed,uint16_t turns, uint8_t steps)
 {
 	distance_type distance_left;
