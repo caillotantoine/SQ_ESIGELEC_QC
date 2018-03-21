@@ -11,7 +11,7 @@
 
 uint8_t new_bearing(uint16_t actual_bearing, int16_t relative_angle, uint16_t* target_bearing)
 {
-    if(new_bearing == 0)
+    if(target_bearing == 0)
     {
         return 1;           /* error : nowhere to write the new data */
     }
