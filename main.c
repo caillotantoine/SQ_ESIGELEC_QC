@@ -23,23 +23,49 @@
  */
 
 void main(void) {
-    //uint16_t actual_bearing = 0;
-    //int16_t target_bearing = 0;
+    distance_type dist;
+    uint8_t in_movement = 0, direction = 0;
 
     WDTCTL = WDTPW | WDTHOLD;    // Stop watchdog timer
     Clock_graceInit_DCO_12M();
     init_display();
     Init_motors();
     Init_encoders_distance();
+
     __enable_interrupt();
 
-    show_number(0);
-    __delay_cycles(12000000);
-    show_number((uint16_t) -turn_step_plus(FORWARD, RIGHT, 30, 50, 3, 4));
-    __delay_cycles(12000000);
-    show_number((uint16_t) -turn_step_plus(BACKWARD, RIGHT, 30, 50, 3, 4));
-    __delay_cycles(12000000);
-    //turn_step_plus(BACKWARD, RIGHT, 30, 50, 3, 4);
+    while(1)
+    {
 
+        if(in_movement == 0){
+            if(direction == FORWARD)/* Move forward */
+            {
+                turn_step_plus_nb(FORWARD, RIGHT, 30, 50, 3, 4);
+                direction = BACKWARD;
+                in_movement = 1;
+            }
+            else
+            {
+                turn_step_plus_nb(BACKWARD, RIGHT, 30, 50, 3, 4);
+                direction = FORWARD;
+                in_movement = 1;
+            }
+        }
+
+        /*Every 2ms we enter in the condition */
+        if(check_and_clear_Tick_out() == 1)
+        {
+            if(check_stops_turning() == 0)
+            {
+                //show_string("o  o");
+                in_movement = 0;
+            }
+
+        }
+
+        /* Do something to show that we are using not blocking functions */
+        Read_distance(LEFT, &dist);                                 /* We read the distance on the left wheel */
+        show_number(dist.turns);                                    /* We print the number of turn we made on the display */
+
+    }
 }
-
