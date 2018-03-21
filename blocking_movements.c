@@ -22,7 +22,7 @@ uint8_t spin_bearing(uint8_t direction, uint8_t speed, uint16_t target_bearing)
 		upper = target_bearing + 3600 + DELTA_BEARING;
 		lower = target_bearing + 3600 - DELTA_BEARING;
 
-		if( ( ((actual_bearing+3600) < upper) && ((actual_bearing+3600) > lower) ) || (actual_bearing > lower)  )
+		if( ( ((actual_bearing+3600) < upper) && ((actual_bearing+3600) > lower) ) || (actual_bearing > lower) || ((actual_bearing+7200) < upper) )
 		{
 			stop = 1;
 		}
