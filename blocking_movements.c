@@ -3,8 +3,7 @@
 #include "control_motors.h"
 #include "control_encoders.h"
 
-#define ONE_MS 12000
-#define ONE_US 12
+#include "timeConstants.h"
 
 uint8_t spin_bearing(uint8_t direction, uint8_t speed, uint16_t target_bearing)
 {
@@ -54,7 +53,7 @@ uint8_t spin_bearing(uint8_t direction, uint8_t speed, uint16_t target_bearing)
 
 			}
 
-			if( ( ((actual_bearing+3600) <= upper) && ((actual_bearing+3600) >= lower) ) || (actual_bearing > lower)  )
+			if( ( ((actual_bearing+3600) <= upper) && ((actual_bearing+3600) >= lower) ) || (actual_bearing > lower)|| ((actual_bearing+7200) < upper) )
 			{
 				stop = 1;
 			}

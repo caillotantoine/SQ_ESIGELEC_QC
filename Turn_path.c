@@ -14,6 +14,78 @@
 uint32_t step_to_reach;
 uint8_t direction_glob;
 
+int8_t turn_step_basic_bearing(uint8_t direction, int8_t innerWspeed, int8_t outerWspeed, uint16_t target_bearing)
+{
+	uint16_t actual_bearing = 0, upper, lower;
+	char stop =0;
+
+	if((innerWspeed >= -100) && (innerWspeed <= 100) && (outerWspeed >= -100) && (outerWspeed <= 100) && ( (target_bearing >= 0) && (target_bearing < 3600) ) )
+	{
+		/* Read bearing */
+		while(Read_compass_16(&actual_bearing) != 0)
+		{
+			show_string("Err1");
+		}
+
+		upper = target_bearing + 3600 + DELTA_BEARING;
+		lower = target_bearing + 3600 - DELTA_BEARING;
+
+		if( ( ((actual_bearing+3600) < upper) && ((actual_bearing+3600) > lower) ) || (actual_bearing > lower) || ((actual_bearing+7200) < upper) )
+		{
+			stop = 1;
+		}
+		else
+		{
+			stop = 0;
+
+			if(direction == RIGHT)
+			{
+				Speed_motor(outerWspeed, LEFT);
+				Speed_motor(innerWspeed, RIGHT);
+			}
+			else
+			{
+				Speed_motor(outerWspeed, RIGHT);
+				Speed_motor(innerWspeed, LEFT);
+			}
+		}
+
+		while(!stop)
+		{
+			show_number(actual_bearing);
+
+			while(Read_compass_16(&actual_bearing) != 0)
+			{
+				__delay_cycles(105*ONE_MS);
+
+				show_string("Err2");
+
+			}
+
+			if( ( ((actual_bearing+3600) <= upper) && ((actual_bearing+3600) >= lower) ) || (actual_bearing > lower) || ((actual_bearing+7200) < upper)  )
+			{
+				stop = 1;
+			}
+			else
+			{
+				stop = 0;
+			}
+			__delay_cycles(105*ONE_MS);
+
+		}
+
+	}
+	else
+	{
+		return 1;
+	}
+
+	Speed_motor(0, RIGHT);
+	Speed_motor(0, LEFT);
+	return 0;
+}
+
+
 int8_t turn_step_plus_nb(uint8_t runDirection, uint8_t direction, uint8_t innerWspeed, uint8_t outerWspeed, uint16_t outerWturns, uint8_t outerWsteps)
 {
     if(runDirection == FORWARD)
@@ -171,3 +243,4 @@ uint32_t distance2steps(distance_type distance)
 {
     return ((uint32_t) distance.turns * (uint32_t) MAX_STEPS) + (uint32_t) distance.steps;
 }
+
