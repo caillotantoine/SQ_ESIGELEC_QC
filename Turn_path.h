@@ -22,7 +22,9 @@ int8_t turn_step_plus_nb(uint8_t runDirection, uint8_t direction, uint8_t innerW
 
 
 /* Turns with bearing */
-/* Blocking Fonctions */
+/* Blocking Functions */
 int8_t turn_step_basic_bearing(uint8_t direction, int8_t innerWspeed, int8_t outerWspeed, uint16_t target_bearing);
+int8_t turn_step_plus_bearing(uint8_t runDirection, uint8_t direction, uint8_t innerWspeed, uint8_t outerWspeed, uint16_t target_bearing);
+
 
 #endif /* SQ_ESIGELEC_QC_TURN_PATH_H_ */
