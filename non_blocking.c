@@ -11,6 +11,30 @@
 static uint16_t distance_to_stop;
 static uint16_t shared_target_bearing;
 
+static uint32_t time_count;
+static uint32_t stop_time;
+
+void stop_nb(uint32_t stopping_time_ms)
+{
+    Speed_motor(0, RIGHT);
+    Speed_motor(0, LEFT);
+    stop_time = stopping_time_ms;
+    time_count = 0;
+}
+
+uint8_t check_stop()
+{
+    //show_number(stop_time-time_count);
+    if(stop_time <= time_count)
+    {
+        return 0;
+    }
+
+    time_count += 2;
+    return 1;
+
+}
+
 
 int8_t nb_turn_step_basic_bearing(uint8_t direction, int8_t innerWspeed, int8_t outerWspeed, uint16_t target_bearing)
 {

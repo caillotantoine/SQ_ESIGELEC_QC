@@ -24,4 +24,6 @@ uint8_t straight_move(uint8_t direction, uint8_t speed,uint16_t turns, uint8_t s
 uint8_t spin_steps(uint8_t direction, uint8_t speed,uint16_t turns, uint8_t steps);
 uint8_t spin_bearing(uint8_t direction, uint8_t speed, uint16_t target_bearing);
 
+void stop(uint16_t ms);
+
 #endif /* BLOCKING_FUNCTION_H_ */

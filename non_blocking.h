@@ -27,4 +27,7 @@ uint8_t check_stop_bearing();
 int8_t nb_turn_step_basic_bearing(uint8_t direction, int8_t innerWspeed, int8_t outerWspeed, uint16_t target_bearing);
 int8_t nb_turn_step_plus_bearing(uint8_t runDirection, uint8_t direction, int8_t innerWspeed, int8_t outerWspeed, uint16_t target_bearing);
 
+void stop_nb(uint32_t stopping_time_ms);
+uint8_t check_stop();
+
 #endif /* SQ_ESIGELEC_QC_NON_BLOCKING_H_ */
