@@ -6,8 +6,108 @@
  */
 #include "non_blocking.h"
 #include "control_motors.h"
+#include "blocking_movements.h"
 
 static uint16_t distance_to_stop;
+static uint16_t shared_target_bearing;
+
+
+int8_t nb_turn_step_basic_bearing(uint8_t direction, int8_t innerWspeed, int8_t outerWspeed, uint16_t target_bearing)
+{
+	if((innerWspeed >= -100) && (innerWspeed <= 100) && (outerWspeed >= -100) && (outerWspeed <= 100) && ( (target_bearing >= 0) && (target_bearing < 3600) ) )
+	{
+		if(direction == RIGHT)
+		{
+			Speed_motor(outerWspeed, LEFT);
+			Speed_motor(innerWspeed, RIGHT);
+		}
+		else if (direction == LEFT)
+		{
+			Speed_motor(outerWspeed, RIGHT);
+			Speed_motor(innerWspeed, LEFT);
+		}
+		else
+		{
+			return 2;
+		}
+
+		shared_target_bearing = target_bearing;
+	}
+	else
+	{
+		return 1;
+	}
+
+	return 0;
+}
+
+int8_t nb_turn_step_plus_bearing(uint8_t runDirection, uint8_t direction, int8_t innerWspeed, int8_t outerWspeed, uint16_t target_bearing)
+{
+	if(runDirection == FORWARD)
+	{
+		return nb_turn_step_basic_bearing(direction, innerWspeed, outerWspeed, target_bearing);
+	}
+	else if (runDirection == BACKWARD)
+	{
+		return nb_turn_step_basic_bearing(direction, -innerWspeed, -outerWspeed, target_bearing);
+	}
+	else
+	{
+		return -4;
+	}
+}
+uint8_t check_stop_bearing()
+{
+	uint16_t actual_bearing = 0, upper =0 , lower =0;
+
+	upper = shared_target_bearing + 3600 + DELTA_BEARING;
+	lower = shared_target_bearing + 3600 - DELTA_BEARING;
+
+	Read_compass_16(&actual_bearing);
+
+
+	if( ( ((actual_bearing+3600) <= upper) && ((actual_bearing+3600) >= lower) ) || (actual_bearing > lower) || ((actual_bearing+7200) < upper) )
+	{
+		Speed_motor(0,RIGHT);
+		Speed_motor(0, LEFT);
+		return 0;
+	}
+	else
+	{
+		return 1;
+	}
+
+}
+
+/* Non- blocking spin
+ * @param Direction The rotation direction (Right or Left)
+ * @param speed Between 0 to 100
+ * @param target_bearing The absolute bearing to reach
+ * Return 1 if the parameter are wrong, else 0 if everything ok*/
+uint8_t nb_spin_bearing(uint8_t direction, uint8_t speed, uint16_t target_bearing)
+{
+	if( ( (direction == RIGHT) || (direction == LEFT) ) && (speed >= 0) && (speed <= 100) && ( (target_bearing >= 0) && (target_bearing < 3600) ) )
+	{
+		if(direction == RIGHT)
+		{
+			Speed_motor(-speed, RIGHT);
+			Speed_motor(speed, LEFT);
+		}
+		else
+		{
+			Speed_motor(speed, RIGHT);
+			Speed_motor(-speed, LEFT);
+		}
+
+		shared_target_bearing = target_bearing;
+	}
+	else
+	{
+		return 1;
+	}
+
+	return 0;
+}
 
 /**
  * Check if the robot got the wanted distance
