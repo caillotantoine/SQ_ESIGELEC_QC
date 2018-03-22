@@ -5,6 +5,8 @@
 
 #include "timeConstants.h"
 
+#include "msp430.h"
+
 uint8_t spin_bearing(uint8_t direction, uint8_t speed, uint16_t target_bearing)
 {
 	uint16_t actual_bearing = 0, upper, lower;
@@ -154,4 +156,15 @@ uint8_t straight_move(uint8_t direction, uint8_t speed,uint16_t turns, uint8_t s
 	{
 		return 1;
 	}
+}
+
+void stop (uint16_t ms)
+{
+    int i = 0;
+    Speed_motor(0, RIGHT);
+    Speed_motor(0, LEFT);
+    for(i = 0; i < ms; i++)
+    {
+        __delay_cycles(12000);
+    }
 }
