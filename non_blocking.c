@@ -11,6 +11,51 @@
 static uint16_t distance_to_stop;
 static uint16_t shared_target_bearing;
 
+
+int8_t nb_turn_step_basic_bearing(uint8_t direction, int8_t innerWspeed, int8_t outerWspeed, uint16_t target_bearing)
+{
+	if((innerWspeed >= -100) && (innerWspeed <= 100) && (outerWspeed >= -100) && (outerWspeed <= 100) && ( (target_bearing >= 0) && (target_bearing < 3600) ) )
+	{
+		if(direction == RIGHT)
+		{
+			Speed_motor(outerWspeed, LEFT);
+			Speed_motor(innerWspeed, RIGHT);
+		}
+		else if (direction == LEFT)
+		{
+			Speed_motor(outerWspeed, RIGHT);
+			Speed_motor(innerWspeed, LEFT);
+		}
+		else
+		{
+			return 2;
+		}
+
+		shared_target_bearing = target_bearing;
+	}
+	else
+	{
+		return 1;
+	}
+
+	return 0;
+}
+
+int8_t nb_turn_step_plus_bearing(uint8_t runDirection, uint8_t direction, int8_t innerWspeed, int8_t outerWspeed, uint16_t target_bearing)
+{
+	if(runDirection == FORWARD)
+	{
+		return nb_turn_step_basic_bearing(direction, innerWspeed, outerWspeed, target_bearing);
+	}
+	else if (runDirection == BACKWARD)
+	{
+		return nb_turn_step_basic_bearing(direction, -innerWspeed, -outerWspeed, target_bearing);
+	}
+	else
+	{
+		return -4;
+	}
+}
 uint8_t check_stop_bearing()
 {
 	uint16_t actual_bearing = 0, upper =0 , lower =0;
@@ -18,9 +63,10 @@ uint8_t check_stop_bearing()
 	upper = shared_target_bearing + 3600 + DELTA_BEARING;
 	lower = shared_target_bearing + 3600 - DELTA_BEARING;
 
-	while(Read_compass_16(&actual_bearing) != 0);
+	Read_compass_16(&actual_bearing);
 
-	if( ( ((actual_bearing+3600) <= upper) && ((actual_bearing+3600) >= lower) ) || (actual_bearing > lower)  )
+
+	if( ( ((actual_bearing+3600) <= upper) && ((actual_bearing+3600) >= lower) ) || (actual_bearing > lower) || ((actual_bearing+7200) < upper) )
 	{
 		Speed_motor(0,RIGHT);
 		Speed_motor(0, LEFT);
